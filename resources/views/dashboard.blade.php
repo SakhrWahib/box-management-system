@@ -96,7 +96,7 @@
                         <div class="bg-indigo-100 p-2 rounded-full ml-2">
                             <i class="fas fa-microchip text-indigo-600 text-xl"></i>
                         </div>
-                        <span class="text-lg font-bold text-gray-800">نظام إدارة الأجهزة وصل</span>
+                        <span class="text-lg font-bold text-gray-800">نظام إدارة الصناديق وصل</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-6">
