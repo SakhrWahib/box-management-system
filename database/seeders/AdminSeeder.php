@@ -14,6 +14,7 @@ class AdminSeeder extends Seeder
             'name' => 'مدير النظام',
             'email' => 'admin@admin.com',
             'password' => Hash::make('123456'),
+            'is_active' => true,
         ]);
     }
 }

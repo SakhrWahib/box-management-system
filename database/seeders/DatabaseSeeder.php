@@ -3,6 +3,11 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Database\Seeders\AdminSeeder;
+use Database\Seeders\SampleDataSeeder;
+use Database\Seeders\DeviceSeeder;
+use Database\Seeders\StorehouseUserSeeder;
+use Database\Seeders\BoxStatusSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,7 +18,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminSeeder::class,
-            SampleDataSeeder::class,
+            StorehouseUserSeeder::class,
+            BoxStatusSeeder::class
         ]);
 
         // \App\Models\User::factory(10)->create();

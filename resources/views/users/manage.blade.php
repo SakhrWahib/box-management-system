@@ -1,16 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-<!-- Main Content Container -->
 <div class="p-6 bg-gray-50">
     <div class="flex justify-between items-center mb-6">
         <div class="flex items-center space-x-4 space-x-reverse">
             <h2 class="text-2xl font-bold text-gray-800">إدارة المستخدمين</h2>
-            <!-- Search Box -->
             <div class="relative">
                 <input type="text" 
                     id="searchInput" 
-                    placeholder="بحث بالاسم أو رقم الهاتف" 
+                    placeholder="بحث بالاسم أو البريد الإلكتروني" 
                     class="pr-10 pl-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm">
                 <i class="fas fa-search absolute right-3 top-3 text-indigo-500"></i>
             </div>
@@ -29,50 +27,44 @@
                     <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">الاسم</th>
                     <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">البريد الإلكتروني</th>
                     <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">رقم الهاتف</th>
-                    <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">البصمة</th>
-                    <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">معرف الجهاز</th>
                     <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">تاريخ التسجيل</th>
                     <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">الإجراءات</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200" id="usersTableBody">
+            <tbody class="bg-white divide-y divide-gray-200">
                 @foreach($users as $user)
-                <tr class="hover:bg-gray-50 transition-colors duration-200">
+                <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
-                            <div class="bg-indigo-100 p-2 rounded-lg ml-2">
-                                <i class="fas fa-user text-indigo-600"></i>
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                    <i class="fas fa-user text-indigo-600"></i>
+                                </div>
                             </div>
-                            <span class="text-gray-700">{{ $user->name }}</span>
+                            <div class="mr-4">
+                                <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
+                            </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ $user->email }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ $user->phone_number }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        @if($user->use_fingerprint)
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-emerald-100 text-emerald-800">
-                                مفعل
-                            </span>
-                        @else
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                غير مفعل
-                            </span>
-                        @endif
+                        <div class="text-sm text-gray-900">{{ $user->email }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ $user->device_id ?? 'لا يوجد' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ $user->created_at->format('Y-m-d') }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex space-x-3 space-x-reverse">
-                            <button onclick="openShowModal({{ $user->id }})" class="bg-indigo-100 p-2 rounded-lg hover:bg-indigo-200 transition-colors">
-                                <i class="fas fa-eye text-indigo-600"></i>
-                            </button>
-                            <button onclick="openEditModal({{ $user->id }})" class="bg-amber-100 p-2 rounded-lg hover:bg-amber-200 transition-colors">
-                                <i class="fas fa-edit text-amber-600"></i>
-                            </button>
-                            <button onclick="deleteUser({{ $user->id }})" class="bg-red-100 p-2 rounded-lg hover:bg-red-200 transition-colors">
-                                <i class="fas fa-trash-alt text-red-600"></i>
-                            </button>
-                        </div>
+                        <div class="text-sm text-gray-900">{{ $user->phone_number }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ $user->created_at->format('Y/m/d') }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
+                        <button onclick="showUser({{ $user->id }})" class="text-blue-600 hover:text-blue-900 ml-3">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="editUser({{ $user->id }})" class="text-indigo-600 hover:text-indigo-900 ml-3">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteUser({{ $user->id }})" class="text-red-600 hover:text-red-900">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </td>
                 </tr>
                 @endforeach
@@ -81,94 +73,47 @@
     </div>
 
     <!-- Pagination -->
-    <div class="mt-6" id="pagination">
+    <div class="mt-4">
         {{ $users->links() }}
     </div>
 </div>
 
-<!-- Create User Modal -->
-<div id="createModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
-    <div class="modal-container bg-white w-96 mx-auto mt-20 rounded-xl shadow-xl transform transition-all">
-        <div class="modal-header border-b px-6 py-4 flex justify-between items-center bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-t-xl">
-            <h3 class="text-xl font-bold text-white">إضافة مستخدم جديد</h3>
-            <button onclick="closeModal('createModal')" class="text-white hover:text-gray-200 transition-colors">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="modal-body p-6">
-            <form id="createUserForm" onsubmit="submitCreateForm(event)">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">الاسم</label>
-                        <input type="text" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
-                        <input type="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">رقم الهاتف</label>
-                        <input type="text" name="phone_number" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
-                        <input type="password" name="password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                    <div class="flex items-center">
-                        <input type="checkbox" name="use_fingerprint" class="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                        <label class="mr-2 text-sm font-medium text-gray-700">تفعيل البصمة</label>
-                    </div>
+<!-- Create/Edit Modal -->
+<div id="userModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4" id="modalTitle">إضافة مستخدم جديد</h3>
+            <form id="userForm" onsubmit="submitForm(event)">
+                @csrf
+                <input type="hidden" id="userId" name="id">
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="name">الاسم</label>
+                    <input type="text" id="name" name="name" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
-                <div class="mt-6 flex justify-end space-x-3 space-x-reverse">
-                    <button type="button" onclick="closeModal('createModal')" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-                        إلغاء
-                    </button>
-                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-colors">
-                        حفظ
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
-<!-- Edit User Modal -->
-<div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
-    <div class="modal-container bg-white w-96 mx-auto mt-20 rounded-xl shadow-xl transform transition-all">
-        <div class="modal-header border-b px-6 py-4 flex justify-between items-center bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-t-xl">
-            <h3 class="text-xl font-bold text-white">تعديل بيانات المستخدم</h3>
-            <button onclick="closeModal('editModal')" class="text-white hover:text-gray-200 transition-colors">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="modal-body p-6">
-            <form id="editUserForm" onsubmit="submitEditForm(event)">
-                <input type="hidden" name="user_id" id="edit_user_id">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">الاسم</label>
-                        <input type="text" name="name" id="edit_name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
-                        <input type="email" name="email" id="edit_email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">رقم الهاتف</label>
-                        <input type="text" name="phone_number" id="edit_phone_number" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                    <div class="flex items-center">
-                        <input type="checkbox" name="use_fingerprint" id="edit_use_fingerprint" class="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                        <label class="mr-2 text-sm font-medium text-gray-700">تفعيل البصمة</label>
-                    </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="email">البريد الإلكتروني</label>
+                    <input type="email" id="email" name="email" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
-                <div class="mt-6 flex justify-end space-x-3 space-x-reverse">
-                    <button type="button" onclick="closeModal('editModal')" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-                        إلغاء
-                    </button>
-                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-colors">
-                        تحديث
-                    </button>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="phone_number">رقم الهاتف</label>
+                    <input type="text" id="phone_number" name="phone_number" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+
+                <div class="mb-4" id="passwordField">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="password">كلمة المرور</label>
+                    <input type="password" id="password" name="password"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg ml-2">إلغاء</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg">حفظ</button>
                 </div>
             </form>
         </div>
@@ -176,204 +121,212 @@
 </div>
 
 <!-- Show User Modal -->
-<div id="showModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
-    <div class="modal-container bg-white w-96 mx-auto mt-20 rounded-xl shadow-xl transform transition-all">
-        <div class="modal-header border-b px-6 py-4 flex justify-between items-center bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-t-xl">
-            <h3 class="text-xl font-bold text-white">تفاصيل المستخدم</h3>
-            <button onclick="closeModal('showModal')" class="text-white hover:text-gray-200 transition-colors">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="modal-body p-6">
+<div id="showUserModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">تفاصيل المستخدم</h3>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-1">الاسم</label>
-                    <p id="show_name" class="text-gray-900 font-medium"></p>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">الاسم</label>
+                    <p id="show_name" class="text-gray-600"></p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-1">البريد الإلكتروني</label>
-                    <p id="show_email" class="text-gray-900 font-medium"></p>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">البريد الإلكتروني</label>
+                    <p id="show_email" class="text-gray-600"></p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-1">رقم الهاتف</label>
-                    <p id="show_phone_number" class="text-gray-900 font-medium"></p>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">رقم الهاتف</label>
+                    <p id="show_phone" class="text-gray-600"></p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-1">البصمة</label>
-                    <p id="show_fingerprint" class="inline-flex px-3 py-1 text-sm font-semibold rounded-full"></p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-1">معرف الجهاز</label>
-                    <p id="show_device_id" class="text-gray-900 font-medium"></p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-1">تاريخ التسجيل</label>
-                    <p id="show_created_at" class="text-gray-900 font-medium"></p>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">تاريخ التسجيل</label>
+                    <p id="show_created_at" class="text-gray-600"></p>
                 </div>
             </div>
-            <div class="mt-6 flex justify-end">
-                <button type="button" onclick="closeModal('showModal')" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-                    إغلاق
-                </button>
+            <div class="mt-4 flex justify-end">
+                <button onclick="closeShowModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">إغلاق</button>
             </div>
         </div>
     </div>
 </div>
-@endsection
 
 @push('scripts')
 <script>
-    $(document).ready(function() {
-        // تهيئة البحث
-        $('#searchInput').on('keyup', function() {
-            var value = $(this).val().toLowerCase();
-            $("#usersTableBody tr").filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-            });
+let isEditing = false;
+
+function openCreateModal() {
+    isEditing = false;
+    document.getElementById('modalTitle').textContent = 'إضافة مستخدم جديد';
+    document.getElementById('userForm').reset();
+    document.getElementById('passwordField').style.display = 'block';
+    document.getElementById('userModal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('userModal').classList.add('hidden');
+}
+
+function editUser(id) {
+    isEditing = true;
+    fetch(`/users/${id}`)
+        .then(response => response.json())
+        .then(user => {
+            document.getElementById('modalTitle').textContent = 'تعديل المستخدم';
+            document.getElementById('userId').value = user.id;
+            document.getElementById('name').value = user.name;
+            document.getElementById('email').value = user.email;
+            document.getElementById('phone_number').value = user.phone_number;
+            
+            // إضافة حقل _method للتعامل مع PUT
+            const form = document.getElementById('userForm');
+            let methodInput = form.querySelector('input[name="_method"]');
+            if (!methodInput) {
+                methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                form.appendChild(methodInput);
+            }
+            methodInput.value = 'PUT';
+            
+            // إخفاء حقل كلمة المرور في حالة التعديل
+            document.getElementById('passwordField').style.display = 'none';
+            
+            document.getElementById('userModal').classList.remove('hidden');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('حدث خطأ أثناء تحميل بيانات المستخدم');
         });
+}
+
+function submitForm(e) {
+    e.preventDefault();
+    const form = document.getElementById('userForm');
+    const formData = new FormData(form);
+    const userId = document.getElementById('userId').value;
+    const url = isEditing ? `/users/${userId}` : '/users';
+    const method = isEditing ? 'PUT' : 'POST';
+
+    const data = {};
+    formData.forEach((value, key) => {
+        if (key !== '_token' && key !== '_method') {
+            data[key] = value;
+        }
     });
 
-    // عرض تفاصيل المستخدم
-    function openShowModal(id) {
-        $.get(`/users/${id}`, function(user) {
-            $('#show_name').text(user.name);
-            $('#show_email').text(user.email);
-            $('#show_phone_number').text(user.phone_number);
-            
-            // تحسين عرض حالة البصمة
-            const fingerprintElement = $('#show_fingerprint');
-            if (user.use_fingerprint) {
-                fingerprintElement.removeClass('bg-gray-100 text-gray-800').addClass('bg-emerald-100 text-emerald-800').text('مفعل');
-            } else {
-                fingerprintElement.removeClass('bg-emerald-100 text-emerald-800').addClass('bg-gray-100 text-gray-800').text('غير مفعل');
-            }
-            
-            $('#show_device_id').text(user.device_id || 'لا يوجد');
-            $('#show_created_at').text(new Date(user.created_at).toLocaleDateString('ar-SA'));
-            $('#showModal').removeClass('hidden');
-        });
-    }
-
-    // تحرير المستخدم
-    function openEditModal(id) {
-        $.get(`/users/${id}`, function(user) {
-            $('#edit_user_id').val(user.id);
-            $('#edit_name').val(user.name);
-            $('#edit_email').val(user.email);
-            $('#edit_phone_number').val(user.phone_number);
-            $('#edit_use_fingerprint').prop('checked', user.use_fingerprint);
-            $('#editModal').removeClass('hidden');
-        });
-    }
-
-    // إضافة مستخدم جديد
-    function openCreateModal() {
-        $('#createUserForm')[0].reset();
-        $('#createModal').removeClass('hidden');
-    }
-
-    // إغلاق النوافذ المنبثقة
-    function closeModal(modalId) {
-        $(`#${modalId}`).addClass('hidden');
-    }
-
-    // حذف مستخدم
-    function deleteUser(id) {
-        if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
-            $.ajax({
-                url: `/users/${id}`,
-                type: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(result) {
-                    showNotification('تم حذف المستخدم بنجاح', 'success');
-                    location.reload();
-                },
-                error: function(xhr) {
-                    showNotification('حدث خطأ أثناء حذف المستخدم', 'error');
-                }
-            });
+    fetch(url, {
+        method: method,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            throw new Error(data.message || 'حدث خطأ أثناء حفظ البيانات');
         }
-    }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('حدث خطأ: ' + error.message);
+    });
+}
 
-    // تقديم نموذج الإنشاء
-    function submitCreateForm(event) {
-        event.preventDefault();
-        const form = $('#createUserForm');
-        $.ajax({
-            url: '/users',
-            type: 'POST',
-            data: form.serialize(),
+function deleteUser(id) {
+    if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+        fetch(`/users/${id}`, {
+            method: 'DELETE',
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(result) {
-                closeModal('createModal');
-                showNotification('تم إضافة المستخدم بنجاح', 'success');
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
                 location.reload();
-            },
-            error: function(xhr) {
-                showNotification('حدث خطأ أثناء إضافة المستخدم', 'error');
+            } else {
+                alert('حدث خطأ أثناء حذف المستخدم');
             }
         });
     }
+}
 
-    // تقديم نموذج التحرير
-    function submitEditForm(event) {
-        event.preventDefault();
-        const form = $('#editUserForm');
-        const id = $('#edit_user_id').val();
-        $.ajax({
-            url: `/users/${id}`,
-            type: 'PUT',
-            data: form.serialize(),
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(result) {
-                closeModal('editModal');
-                showNotification('تم تحديث بيانات المستخدم بنجاح', 'success');
-                location.reload();
-            },
-            error: function(xhr) {
-                showNotification('حدث خطأ أثناء تحديث بيانات المستخدم', 'error');
-            }
+function showUser(id) {
+    fetch(`/users/${id}`)
+        .then(response => response.json())
+        .then(user => {
+            document.getElementById('show_name').textContent = user.name;
+            document.getElementById('show_email').textContent = user.email;
+            document.getElementById('show_phone').textContent = user.phone_number;
+            document.getElementById('show_created_at').textContent = new Date(user.created_at).toLocaleDateString('ar-SA');
+            document.getElementById('showUserModal').classList.remove('hidden');
         });
-    }
+}
 
-    // عرض الإشعارات
-    function showNotification(message, type) {
-        const bgColor = type === 'success' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800';
-        const icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
+function closeShowModal() {
+    document.getElementById('showUserModal').classList.add('hidden');
+}
+
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    const searchTerm = e.target.value;
+    fetch(`/users/manage?search=${searchTerm}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const tbody = document.querySelector('tbody');
+        tbody.innerHTML = '';
         
-        const notification = $(`
-            <div class="fixed top-4 left-4 max-w-sm w-full bg-white rounded-lg shadow-lg pointer-events-auto transform transition-all duration-300 ease-in-out opacity-0 translate-y-2">
-                <div class="p-4">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-${icon} text-lg ${type === 'success' ? 'text-emerald-500' : 'text-red-500'}"></i>
+        data.users.data.forEach(user => {
+            tbody.innerHTML += `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                    <i class="fas fa-user text-indigo-600"></i>
+                                </div>
+                            </div>
+                            <div class="mr-4">
+                                <div class="text-sm font-medium text-gray-900">${user.name}</div>
+                            </div>
                         </div>
-                        <div class="ml-3 w-0 flex-1">
-                            <p class="text-sm font-medium text-gray-900">${message}</p>
-                        </div>
-                        <div class="ml-4 flex-shrink-0 flex">
-                            <button class="inline-flex text-gray-400 hover:text-gray-500 focus:outline-none">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `);
-        
-        $('body').append(notification);
-        setTimeout(() => notification.removeClass('opacity-0 translate-y-2'), 100);
-        
-        setTimeout(() => {
-            notification.addClass('opacity-0 translate-y-2');
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${user.email}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${user.phone_number}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${new Date(user.created_at).toLocaleDateString('ar-SA')}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
+                        <button onclick="showUser(${user.id})" class="text-blue-600 hover:text-blue-900 ml-3">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="editUser(${user.id})" class="text-indigo-600 hover:text-indigo-900 ml-3">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteUser(${user.id})" class="text-red-600 hover:text-red-900">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    });
+});
 </script>
 @endpush
+@endsection

@@ -16,9 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('phone_number')->unique();
-            $table->boolean('use_fingerprint')->default(false);
-            $table->text('fingerprint_data')->nullable();
-            $table->string('device_id')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('tempCode')->nullable();

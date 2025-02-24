@@ -31,9 +31,6 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'phone_number' => 'required|string|min:8|unique:users,phone_number',
-            'site_data' => 'nullable|string|max:500',
-            'use_fingerprint' => 'boolean',
-            'fingerprint_data' => 'nullable|string',
         ]);
 
         // If validation fails, return errors
@@ -51,9 +48,6 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
             'phone_number' => $request->phone_number,
             'tempCode' => $tempCode,
-            'site_data' => $request->site_data,
-            'use_fingerprint' => $request->use_fingerprint ?? false,
-            'fingerprint_data' => $request->fingerprint_data,
         ]);
 
         // Send the code to the user's email
@@ -97,9 +91,6 @@ class UserController extends Controller
             'name' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $id,
             'phone_number' => 'sometimes|nullable|string|min:8|unique:users,phone_number,' . $id,
-            'site_data' => 'sometimes|nullable|string|max:500',
-            'use_fingerprint' => 'sometimes|boolean',
-            'fingerprint_data' => 'sometimes|nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -110,9 +101,6 @@ class UserController extends Controller
             'name' => $request->name ?? $user->name,
             'email' => $request->email ?? $user->email,
             'phone_number' => $request->phone_number ?? $user->phone_number,
-            'site_data' => $request->site_data ?? $user->site_data,
-            'use_fingerprint' => $request->use_fingerprint ?? $user->use_fingerprint,
-            'fingerprint_data' => $request->fingerprint_data ?? $user->fingerprint_data,
         ]);
 
         return response()->json($user);

@@ -31,4 +31,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'google' => [
+        'maps_api_key' => env('AIzaSyAC4mowAo_ZpcOXny51X1_4tsq9vx-E0tE'),
+    ],
+
 ];

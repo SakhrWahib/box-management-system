@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Subuser;
 use App\Models\User;
+use App\Models\Device;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -17,11 +18,12 @@ class SubuserController extends Controller
 
     public function store(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'username' => 'required|string|max:255',
             'const_code' => 'required|integer',
             'user_id' => 'required|integer|exists:users,id',
+            'email' => 'nullable|email|max:255|unique:subusers,email',
+            'phone' => 'nullable|string|max:20'
         ]);
 
         if ($validator->fails()) {
@@ -32,7 +34,9 @@ class SubuserController extends Controller
             'username' => $request->username,
             'const_code' => $request->const_code,
             'user_id' => $request->user_id,
-            'device_id' =>$request->device_id
+            'device_id' => $request->device_id,
+            'email' => $request->email,
+            'phone' => $request->phone
         ]);
 
         return response()->json($user, 201);
@@ -113,5 +117,47 @@ class SubuserController extends Controller
                 'message' => 'يرجى توفير userid في الطلب.',
             ], 400);
         }
+    }
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'const_code' => 'required|string|size:4',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'الرجاء إدخال البريد الإلكتروني والرمز بشكل صحيح',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $subuser = Subuser::where('email', $request->email)
+                         ->where('const_code', $request->const_code)
+                         ->first();
+
+        if (!$subuser) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'البريد الإلكتروني أو الرمز غير صحيح'
+            ], 401);
+        }
+
+        // Get device information
+        $device = Device::find($subuser->device_id);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم تسجيل الدخول بنجاح',
+            'data' => [
+                'username' => $subuser->username,
+                'const_code' => $subuser->const_code,
+                'user_id' => $subuser->user_id,
+                'device_id' => $subuser->device_id,
+                'email' => $subuser->email,
+                'device' => $device
+            ]
+        ]);
     }
 }

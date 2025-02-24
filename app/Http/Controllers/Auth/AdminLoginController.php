@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminLoginController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('guest:admin')->except('logout');
+    }
+
     public function showLoginForm()
     {
         return view('auth.login');
@@ -21,8 +26,17 @@ class AdminLoginController extends Controller
         ]);
 
         if (Auth::guard('admin')->attempt($credentials, $request->remember)) {
+            $admin = Auth::guard('admin')->user();
+            
+            if (!$admin->is_active) {
+                Auth::guard('admin')->logout();
+                return back()->withErrors([
+                    'email' => 'هذا الحساب غير نشط. يرجى الاتصال بالمسؤول.',
+                ]);
+            }
+
             $request->session()->regenerate();
-            return redirect()->intended('dashboard');
+            return redirect()->intended(route('boxes-under-manufacturing.index'));
         }
 
         return back()->withErrors([
@@ -35,6 +49,6 @@ class AdminLoginController extends Controller
         Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/');
+        return redirect()->route('admin.login');
     }
 }

@@ -22,10 +22,8 @@ class User extends Authenticatable
         'email',
         'phone_number',
         'password',
-        'use_fingerprint',
-        'fingerprint_data',
-        'device_id',
-        'tempCode'
+        'tempCode',
+        'email_verified_at'
     ];
 
     /**
@@ -44,9 +42,7 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'last_login_at' => 'datetime',
-        'use_fingerprint' => 'boolean'
+        'email_verified_at' => 'datetime'
     ];
 
     public function subusers()

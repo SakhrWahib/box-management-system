@@ -36,6 +36,20 @@
                         </div>
                         <span class="text-lg font-bold text-gray-800">نظام إدارة الصناديق وصل</span>
                     </div>
+                    
+                    <!-- زر المستودع -->
+                    <a href="{{ route('boxes-under-manufacturing.index') }}" 
+                       class="nav-item flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200">
+                        <i class="fas fa-warehouse ml-2 text-indigo-600"></i>
+                        <span>المستودع</span>
+                    </a>
+
+                    <!-- زر الدعم الفني -->
+                    <a href="{{ route('support.index') }}" 
+                       class="nav-item flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200">
+                        <i class="fas fa-headset ml-2 text-indigo-600"></i>
+                        <span>الدعم الفني</span>
+                    </a>
                 </div>
                 <div class="flex items-center gap-6">
                     <!-- Time and Date -->
@@ -54,29 +68,72 @@
                                 {{ \App\Models\Notification::where('is_read', false)->count() }}
                             </span>
                         </button>
-                        <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 w-80 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-100">
+                        <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 w-96 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-100">
+                            <div class="p-3 bg-indigo-50 border-b border-indigo-100">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-bold text-indigo-900">الإشعارات</h3>
+                                    <span class="text-xs text-indigo-600 bg-indigo-100 px-2 py-1 rounded-full">
+                                        {{ \App\Models\Notification::where('is_read', false)->count() }} غير مقروء
+                                    </span>
+                                </div>
+                            </div>
                             <div class="max-h-96 overflow-y-auto">
-                                @foreach(\App\Models\Notification::latest()->take(5)->get() as $notification)
-                                <div class="p-3 border-b hover:bg-gray-50 {{ !$notification->is_read ? 'bg-indigo-50' : '' }} transition-colors duration-200">
-                                    <div class="flex items-start">
+                                @foreach(\App\Models\Notification::with(['device', 'user'])->latest()->take(5)->get() as $notification)
+                                <div class="p-4 border-b hover:bg-gray-50 {{ !$notification->is_read ? 'bg-indigo-50' : '' }} transition-colors duration-200">
+                                    <div class="flex items-start space-x-3 space-x-reverse">
+                                        <!-- Notification Icon based on type -->
                                         <div class="flex-shrink-0">
-                                            <i class="fas fa-info-circle text-indigo-500"></i>
+                                            @if($notification->type == 'maintenance')
+                                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                                    <i class="fas fa-tools text-blue-600"></i>
+                                                </div>
+                                            @else
+                                                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                                                    <i class="fas fa-bell text-gray-600"></i>
+                                                </div>
+                                            @endif
                                         </div>
-                                        <div class="mr-3 flex-1">
-                                            <p class="text-sm font-medium text-gray-900">
-                                                {{ $notification->title }}
-                                            </p>
-                                            <p class="text-xs text-gray-500 mt-1">
-                                                {{ $notification->created_at->diffForHumans() }}
-                                            </p>
+                                        
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center justify-between">
+                                                <p class="text-sm font-medium text-gray-900">
+                                                    {{ $notification->message }}
+                                                </p>
+                                                @if(!$notification->is_read)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                                        جديد
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <div class="mt-1 flex items-center justify-between">
+                                                <div class="flex items-center text-xs text-gray-500">
+                                                    @if($notification->device)
+                                                        <span class="ml-2">
+                                                            <i class="fas fa-microchip ml-1"></i>
+                                                            {{ $notification->device->device_name }}
+                                                        </span>
+                                                    @endif
+                                                    @if($notification->user)
+                                                        <span>
+                                                            <i class="fas fa-user ml-1"></i>
+                                                            {{ $notification->user->name }}
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                <span class="text-xs text-gray-500" title="{{ $notification->created_at }}">
+                                                    {{ $notification->created_at->diffForHumans() }}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 @endforeach
                             </div>
-                            <a href="{{ route('notifications.index') }}" class="block text-center py-2 text-sm text-indigo-600 border-t hover:bg-gray-50 transition-colors duration-200">
-                                عرض كل الإشعارات
-                            </a>
+                            @if(\App\Models\Notification::count() > 5)
+                                <a href="{{ route('notifications.index') }}" class="block text-center py-3 text-sm text-indigo-600 bg-gray-50 hover:bg-gray-100 transition-colors duration-200 font-medium">
+                                    عرض كل الإشعارات ({{ \App\Models\Notification::count() }})
+                                </a>
+                            @endif
                         </div>
                     </div>
                     
@@ -121,12 +178,15 @@
                         <span class="font-medium tracking-wide">الرئيسية</span>
                     </a>
                 </li>
+                
+            
+
                 <li>
                     <a href="{{ route('devices.manage') }}" class="flex items-center text-gray-100 p-3 rounded-lg hover:bg-white/10 transition-all duration-300 group transform hover:-translate-x-1">
                         <div class="bg-indigo-500/20 p-2.5 rounded-lg ml-3 group-hover:bg-indigo-500/30 transition-colors duration-300">
-                            <i class="fas fa-microchip text-indigo-300 text-lg"></i>
+                            <i class="fas fa-boxes text-indigo-300 text-lg"></i>
                         </div>
-                        <span class="font-medium tracking-wide">الأجهزة</span>
+                        <span class="font-medium tracking-wide">الصناديق</span>
                     </a>
                 </li>
 
@@ -139,6 +199,14 @@
                             <i class="fas fa-users-cog text-indigo-300 text-lg"></i>
                         </div>
                         <span class="font-medium tracking-wide">المستخدمين</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('subusers.index') }}" class="flex items-center text-gray-100 p-3 rounded-lg hover:bg-white/10 transition-all duration-300 group transform hover:-translate-x-1">
+                        <div class="bg-indigo-500/20 p-2.5 rounded-lg ml-3 group-hover:bg-indigo-500/30 transition-colors duration-300">
+                            <i class="fas fa-users-cog text-indigo-300 text-lg"></i>
+                        </div>
+                        <span class="font-medium tracking-wide">المستخدمين الفرعيين</span>
                     </a>
                 </li>
                 <li>
@@ -161,21 +229,42 @@
                         <span class="font-medium tracking-wide">التقارير</span>
                     </a>
                 </li>
-                <li>
-                    <a href="{{ route('notifications.index') }}" class="flex items-center text-gray-100 p-3 rounded-lg hover:bg-white/10 transition-all duration-300 group transform hover:-translate-x-1">
+        {{-- 
+<li>
+    <a href="{{ route('notifications.index') }}" class="flex items-center text-gray-100 p-3 rounded-lg hover:bg-white/10 transition-all duration-300 group transform hover:-translate-x-1">
+        <div class="bg-indigo-500/20 p-2.5 rounded-lg ml-3 group-hover:bg-indigo-500/30 transition-colors duration-300">
+            <i class="fas fa-bell text-indigo-300 text-lg"></i>
+        </div>
+        <span class="font-medium tracking-wide">الإشعارات</span>
+        @if(\App\Models\Notification::where('is_read', false)->count() > 0)
+            <span class="mr-auto bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full animate-pulse">
+                {{ \App\Models\Notification::where('is_read', false)->count() }}
+            </span>
+        @endif
+    </a>
+</li>
+--}}
+
+                    <!-- خريطة الصناديق -->
+                    <li>
+                    <a href="{{ route('map.index') }}" class="flex items-center text-gray-100 p-3 rounded-lg hover:bg-white/10 transition-all duration-300 group transform hover:-translate-x-1">
                         <div class="bg-indigo-500/20 p-2.5 rounded-lg ml-3 group-hover:bg-indigo-500/30 transition-colors duration-300">
-                            <i class="fas fa-bell text-indigo-300 text-lg"></i>
+                            <i class="fas fa-map-marker-alt text-indigo-300 text-lg"></i>
                         </div>
-                        <span class="font-medium tracking-wide">الإشعارات</span>
-                        @if(\App\Models\Notification::where('is_read', false)->count() > 0)
-                            <span class="mr-auto bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full animate-pulse">
-                                {{ \App\Models\Notification::where('is_read', false)->count() }}
-                            </span>
-                        @endif
+                        <span class="font-medium tracking-wide">خريطة الصناديق</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('maintenance.index') }}" class="flex items-center text-gray-100 p-3 rounded-lg hover:bg-white/10 transition-all duration-300 group transform hover:-translate-x-1">
+                        <div class="bg-indigo-500/20 p-2.5 rounded-lg ml-3 group-hover:bg-indigo-500/30 transition-colors duration-300">
+                            <i class="fas fa-tools text-indigo-300 text-lg"></i>
+                        </div>
+                        <span class="font-medium tracking-wide">الصيانة</span>
                     </a>
                 </li>
 
-                
+        
+
                 </li>
             </ul>
         </nav>

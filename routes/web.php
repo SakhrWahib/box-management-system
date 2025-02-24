@@ -2,64 +2,66 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AdminLoginController;
-use App\Http\Controllers\UserManagementController;
-use App\Http\Controllers\DeviceManagementController;
-use App\Http\Controllers\EventReportController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\StorehouseUserController;
+use App\Http\Controllers\WorkshopAndBoxTypeController;
+use App\Http\Controllers\BoxUnderManufacturingController;
+use App\Http\Controllers\ManufacturedBoxController;
+use App\Http\Controllers\InventoryBoxController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
+// الصفحة الرئيسية تحول إلى صفحة تسجيل الدخول
 Route::get('/', function () {
     return redirect()->route('admin.login');
 });
 
-Route::get('/hello', function () {
-    return "hello web";
+// مسارات المصادقة
+Route::middleware('guest:admin')->group(function () {
+    Route::get('admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
 });
 
-// Admin routes
-Route::get('admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
-Route::post('admin/login', [AdminLoginController::class, 'login']);
 Route::post('admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
 
-// Protected admin routes
+// المسارات المحمية
 Route::middleware(['auth:admin'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // توجيه الصفحة الرئيسية بعد تسجيل الدخول
+    Route::get('/', function () {
+        return redirect()->route('boxes-under-manufacturing.index');
+    });
+
+    // Boxes Under Manufacturing Routes
+    Route::resource('boxes-under-manufacturing', BoxUnderManufacturingController::class);
+    Route::post('boxes-under-manufacturing/{id}/update-status', [BoxUnderManufacturingController::class, 'updateStatus'])
+        ->name('boxes-under-manufacturing.update-status');
+    Route::post('boxes-under-manufacturing/{id}/update-payment', [BoxUnderManufacturingController::class, 'updatePayment'])
+        ->name('boxes-under-manufacturing.update-payment');
+    Route::post('/boxes-under-manufacturing/{id}/update-quantity', [BoxUnderManufacturingController::class, 'updateQuantity'])
+        ->name('boxes-under-manufacturing.update-quantity');
+    Route::post('/boxes-under-manufacturing/{id}/mark-completed', [BoxUnderManufacturingController::class, 'markAsCompleted'])
+        ->name('boxes-under-manufacturing.mark-completed');
+    Route::put('/boxes-under-manufacturing/{id}/update-received-quantity', [BoxUnderManufacturingController::class, 'updateReceivedQuantity'])
+        ->name('boxes-under-manufacturing.update-received-quantity');
+
+    // باقي المسارات المحمية
+    Route::resource('inventory-boxes', InventoryBoxController::class);
+    Route::resource('manufactured-boxes', ManufacturedBoxController::class);
+    Route::resource('storehouse-users', StorehouseUserController::class);
     
-    // User Management Routes
-    Route::resource('permissions', PermissionController::class);
-    Route::get('/users/manage', [UserManagementController::class, 'index'])->name('users.manage');
-    Route::get('/users/{id}', [UserManagementController::class, 'show'])->name('users.show');
-    Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
-    Route::put('/users/{id}', [UserManagementController::class, 'update'])->name('users.update');
-    Route::delete('/users/{id}', [UserManagementController::class, 'destroy'])->name('users.destroy');
+    // Workshops and Box Types Routes
+    Route::get('/workshops-and-box-types', [WorkshopAndBoxTypeController::class, 'index'])->name('workshops-and-box-types.index');
+    Route::post('/workshops-and-box-types', [WorkshopAndBoxTypeController::class, 'store'])->name('workshops-and-box-types.store');
+    Route::put('/workshops-and-box-types/{type}/{id}', [WorkshopAndBoxTypeController::class, 'update'])->name('workshops-and-box-types.update');
+    Route::delete('/workshops-and-box-types/{type}/{id}', [WorkshopAndBoxTypeController::class, 'destroy'])->name('workshops-and-box-types.destroy');
+    Route::get('/workshops/{workshop}/stats', [WorkshopAndBoxTypeController::class, 'getWorkshopStats'])->name('workshops.stats');
+    Route::get('/workshops-and-box-types/archive', [WorkshopAndBoxTypeController::class, 'archive'])->name('workshops-and-box-types.archive');
+    Route::post('/workshops-and-box-types/workshop/{id}/archive', [WorkshopAndBoxTypeController::class, 'archiveWorkshop'])->name('workshops-and-box-types.archive-workshop');
+    Route::post('/manufacturing-boxes/{id}/restore', [WorkshopAndBoxTypeController::class, 'restoreBox'])->name('manufacturing-boxes.restore');
 
-    // Device Management Routes
-    Route::get('/devices/manage', [DeviceManagementController::class, 'index'])->name('devices.manage');
-    Route::get('/devices/{id}', [DeviceManagementController::class, 'show'])->name('devices.show');
-    Route::post('/devices', [DeviceManagementController::class, 'store'])->name('devices.store');
-    Route::put('/devices/{id}', [DeviceManagementController::class, 'update'])->name('devices.update');
-    Route::delete('/devices/{id}', [DeviceManagementController::class, 'destroy'])->name('devices.destroy');
-
-    // Event Reports Routes
-    Route::get('/events/manage', [EventReportController::class, 'index'])->name('events.manage');
-    Route::get('/events/{id}', [EventReportController::class, 'show'])->name('events.show');
-    Route::get('/events/export', [EventReportController::class, 'export'])->name('events.export');
-
-    // Notification Routes
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
-    Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
-   
+    // Box Types Routes
+    Route::get('/box-types/{id}', [WorkshopAndBoxTypeController::class, 'showBoxType'])->name('box-types.show');
+    Route::post('/box-types', [WorkshopAndBoxTypeController::class, 'storeBoxType'])->name('box-types.store');
+    Route::put('/box-types/{id}', [WorkshopAndBoxTypeController::class, 'updateBoxType'])->name('box-types.update');
+    Route::delete('/box-types/{id}', [WorkshopAndBoxTypeController::class, 'destroyBoxType'])->name('box-types.destroy');
 });
+
+
+

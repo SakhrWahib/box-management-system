@@ -46,11 +46,15 @@
                         <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full {{ $admin->role == 'admin' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800' }}">
                             {{ $admin->role == 'admin' ? 'مدير' : 'مستخدم' }}
                         </span>
-                    </td>
+                    </td> 
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full {{ $admin->status == 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800' }}">
                             {{ $admin->status == 'active' ? 'نشط' : 'غير نشط' }}
                         </span>
+                        <button onclick="toggleStatus({{ $admin->id }}, '{{ $admin->status }}')" 
+                            class="mr-2 {{ $admin->status == 'active' ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' }} p-2 rounded-lg transition duration-150 ease-in-out">
+                            <i class="fas {{ $admin->status == 'active' ? 'fa-ban' : 'fa-check' }}"></i>
+                        </button>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ $admin->created_at->format('Y-m-d') }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2 space-x-reverse">
@@ -383,6 +387,39 @@
     // دالة إغلاق النوافذ المنبثقة
     function closeModal(modalId) {
         hideModal(modalId);
+    }
+
+    // دالة تغيير حالة المستخدم
+    function toggleStatus(id, currentStatus) {
+        const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+        $.ajax({
+            url: `/admin/${id}/toggle-status`,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                status: newStatus
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        title: 'تم بنجاح!',
+                        text: 'تم تحديث حالة المستخدم بنجاح',
+                        icon: 'success',
+                        confirmButtonText: 'حسناً'
+                    }).then(() => {
+                        location.reload();
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    title: 'خطأ!',
+                    text: 'حدث خطأ أثناء تحديث حالة المستخدم',
+                    icon: 'error',
+                    confirmButtonText: 'حسناً'
+                });
+            }
+        });
     }
 </script>
 @endpush
